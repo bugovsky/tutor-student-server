@@ -10,6 +10,17 @@ class Role(Enum):
     admin = "admin"
 
 
+class TutorSubject(Enum):
+    russian = "russian"
+    literature = "literature"
+    mathematics = "mathematics"
+    history = "history"
+    biology = "biology"
+    chemistry = "chemistry"
+    english = "english"
+    physics = "physics"
+
+
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
@@ -19,9 +30,24 @@ class UserCreate(BaseModel):
 class UserOut(BaseModel):
     id: int
     email: EmailStr
+    role: Role
 
     class Config:
         from_attributes = True
+
+
+class TutorToAdd(BaseModel):
+    id: int
+
+
+class TutorOut(BaseModel):
+    id: int
+    email: EmailStr
+    subjects: t.List[TutorSubject]
+
+
+class SubjectsCreate(BaseModel):
+    subject_ids: t.List[int]
 
 
 class Token(BaseModel):
@@ -30,4 +56,4 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    id: t.Optional[str] = None
+    id: t.Optional[int] = None

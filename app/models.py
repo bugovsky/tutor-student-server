@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Enum, ForeignKey, DateTime
 from datetime import datetime
 
 from app.database import Base
-from app.schemas import Role
+from app.schemas import Role, TutorSubject
 
 
 class User(Base):
@@ -16,7 +16,7 @@ class User(Base):
 class Subject(Base):
     __tablename__ = 'subjects'
     id = Column(Integer, primary_key=True)
-    subject_name = Column(String)
+    subject_name = Column(Enum(TutorSubject))
 
 
 class TutorToSubject(Base):
