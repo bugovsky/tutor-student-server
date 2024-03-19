@@ -1,7 +1,10 @@
 import typing as t
+from datetime import datetime
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 from enum import Enum
+
+from pydantic.v1 import root_validator
 
 
 class Role(Enum):
@@ -21,6 +24,16 @@ class TutorSubject(Enum):
     physics = "physics"
 
 
+class Status(Enum):
+    pending = "pending"
+    rejected = "rejected"
+    accepted = "accepted"
+
+
+class TutorResponse(BaseModel):
+    status: Status
+
+
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
@@ -31,6 +44,32 @@ class UserOut(BaseModel):
     id: int
     email: EmailStr
     role: Role
+
+    class Config:
+        from_attributes = True
+
+
+class LessonCreate(BaseModel):
+    student_id: int
+    subject_id: int
+    date_at: str = datetime.now().strftime('%Y-%m-%d %H:%M')
+
+
+class TutorLessonOut(BaseModel):
+    id: int
+    student_id: int
+    subject_id: int
+    date_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class StudentLessonOut(BaseModel):
+    id: int
+    tutor_id: int
+    subject_id: int
+    date_at: datetime
 
     class Config:
         from_attributes = True

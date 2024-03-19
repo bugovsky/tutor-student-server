@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Enum, ForeignKey, DateTime
 from datetime import datetime
 
 from app.database import Base
-from app.schemas import Role, TutorSubject
+from app.schemas import Role, TutorSubject, Status
 
 
 class User(Base):
@@ -20,15 +20,23 @@ class Subject(Base):
 
 
 class TutorToSubject(Base):
-    __tablename__ = 'tutor_to_subject'
+    __tablename__ = 'tutor_to_subjects'
     tutor_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
     subject_id = Column(Integer, ForeignKey('subjects.id'), primary_key=True)
 
 
 class TutorToStudent(Base):
-    __tablename__ = 'tutor_to_student'
+    __tablename__ = 'tutor_to_students'
     tutor_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
     student_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+
+
+class TutorToStudentRequest(Base):
+    __tablename__ = 'tutor_to_student_requests'
+    id = Column(Integer, primary_key=True)
+    tutor_id = Column(Integer, ForeignKey('users.id'))
+    student_id = Column(Integer, ForeignKey('users.id'))
+    status = Column(Enum(Status))
 
 
 class Lesson(Base):
@@ -37,17 +45,12 @@ class Lesson(Base):
     tutor_id = Column(Integer, ForeignKey('users.id'))
     student_id = Column(Integer, ForeignKey('users.id'))
     subject_id = Column(Integer, ForeignKey('subjects.id'))
-    date_at = Column(DateTime, default=datetime.utcnow)
+    date_at = Column(DateTime, default=datetime.now().strftime('%Y-%m-%d %H:%M'))
 
 
 class LessonRequest(Base):
     __tablename__ = 'lesson_request'
     id = Column(Integer, primary_key=True)
     lesson_id = Column(Integer, ForeignKey('lessons.id'))
-    status_id = Column(Integer, ForeignKey('request_statuses.id'))
-
-
-class RequestStatus(Base):
-    __tablename__ = 'request_statuses'
-    id = Column(Integer, primary_key=True)
-    status = Column(String)
+    status_id = Column(Enum(Status))
+    new_date_at = Column(DateTime, default=datetime.utcnow, nullable=True)

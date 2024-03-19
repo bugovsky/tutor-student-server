@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from . import models
 from .database import engine, SessionLocal
 from .models import Subject
-from .routers import user, auth, tutor, student
+from .routers import user, auth, tutor, student, request
 from .schemas import TutorSubject
 
 app = FastAPI()
@@ -14,6 +14,7 @@ app.include_router(auth.router)
 app.include_router(user.router)
 app.include_router(tutor.router)
 app.include_router(student.router)
+app.include_router(request.router)
 
 
 def populate_subjects_table(db: Session):
