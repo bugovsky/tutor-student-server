@@ -1,8 +1,10 @@
 import typing as t
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 from enum import Enum
+
+from pydantic.v1 import root_validator
 
 
 class Role(Enum):
@@ -28,19 +30,11 @@ class Status(Enum):
     accepted = "accepted"
 
 
-class HomeTaskStatus(Enum):
-    in_progress = "in progress"
-    done = "done"
-    expired = "expired"
-
-
 class TutorResponse(BaseModel):
     status: Status
 
 
 class UserCreate(BaseModel):
-    firstname: str
-    lastname: str
     email: EmailStr
     password: str
     role: Role
@@ -48,8 +42,6 @@ class UserCreate(BaseModel):
 
 class UserOut(BaseModel):
     id: int
-    firstname: str
-    lastname: str
     email: EmailStr
     role: Role
 
@@ -60,15 +52,24 @@ class UserOut(BaseModel):
 class LessonCreate(BaseModel):
     student_id: int
     subject_id: int
-    date_at: datetime = datetime.now().strftime('%Y-%m-%d %H:%M')
+    date_at: str = datetime.now().strftime('%Y-%m-%d %H:%M')
 
 
-class LessonOut(BaseModel):
+class TutorLessonOut(BaseModel):
     id: int
-    tutor_id: int
     student_id: int
     subject_id: int
-    date_at: t.Optional[datetime]
+    date_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class StudentLessonOut(BaseModel):
+    id: int
+    tutor_id: int
+    subject_id: int
+    date_at: datetime
 
     class Config:
         from_attributes = True
@@ -86,46 +87,6 @@ class TutorOut(BaseModel):
 
 class SubjectsCreate(BaseModel):
     subject_ids: t.List[int]
-
-
-class LessonRequestCreate(BaseModel):
-    lesson_id: int
-    reason: str
-    new_date_at: t.Optional[datetime] = datetime.now().strftime('%Y-%m-%d %H:%M')
-
-
-class LessonRespondCreate(BaseModel):
-    status: Status
-
-
-class LessonRequestOut(BaseModel):
-    id: int
-    lesson_id: int
-    reason: str
-    status_id: Status = Status.pending
-    new_date_at: t.Optional[datetime]
-
-    class Config:
-        from_attributes = True
-
-
-class HomeTaskCreate(BaseModel):
-    title: str
-    student_id: int
-    description: t.Optional[str]
-    deadline: t.Optional[datetime] = datetime.now().strftime('%Y-%m-%d %H:%M')
-
-
-class HomeTaskOut(BaseModel):
-    id: int
-    title: str
-    tutor_id: int
-    student_id: int
-    description: t.Optional[str]
-    deadline: t.Optional[datetime]
-
-    class Config:
-        from_attributes = True
 
 
 class Token(BaseModel):
