@@ -18,9 +18,11 @@ services:
     image: postgres
     ports:
       - "5432:5432"
+    env_file:
+      - ./.env
     environment:
-      - POSTGRES_PASSWORD=1234
-      - POSTGRES_DB=tutor_student_interaction
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
     volumes:
       - postgres-db:/var/lib/postgresql/data
 
