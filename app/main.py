@@ -1,38 +1,46 @@
 from fastapi import FastAPI
-from sqlalchemy import func
-from sqlalchemy.orm import Session
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+import yadisk
 
-from . import models
-from .database import engine, SessionLocal
-from .models import Subject
-from .routers import user, auth, tutor, student, request
-from .schemas import TutorSubject
+from app.utils import cloud
+from app.database import engine, Base, async_session
+from app.models import Subject
+from app import config
+from app.routers import users, auth, tutors, students, reschedule, enrollment, hometask
+from app.schemas import TutorSubject
 
 app = FastAPI()
 
 app.include_router(auth.router)
-app.include_router(user.router)
-app.include_router(tutor.router)
-app.include_router(student.router)
-app.include_router(request.router)
+app.include_router(users.router)
+app.include_router(tutors.router)
+app.include_router(students.router)
+app.include_router(enrollment.router)
+app.include_router(reschedule.router)
+app.include_router(hometask.router)
 
 
-def populate_subjects_table(db: Session):
-    if db.query(func.count(Subject.id)).scalar() == 0:
-        for subject_name in TutorSubject:
-            db_subject = Subject(subject_name=subject_name)
-            db.add(db_subject)
-        db.commit()
+async def init_models():
+    async with engine.begin() as conn:
+        # await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
 
 
-def startup():
-    # models.Base.metadata.drop_all(bind=engine)
-    models.Base.metadata.create_all(bind=engine)
-    db = SessionLocal()
-    populate_subjects_table(db)
-    db.close()
+async def populate_subjects_table(db: AsyncSession):
+    query = select(func.count(Subject.id))
+    res = await db.execute(query)
+    if res.scalars().first() == 0:
+        subjects = [Subject(subject_name=subject) for subject in TutorSubject]
+        db.add_all(subjects)
+        await db.commit()
 
 
 @app.on_event("startup")
-async def startup_event():
-    startup()
+async def init():
+    await init_models()
+    y = yadisk.AsyncClient(token=config.settings.yandex_disk_token)
+    async with y:
+        await cloud.create_folder_disk(y, "/TutorStudentApp")
+    async with async_session() as db:
+        await populate_subjects_table(db)

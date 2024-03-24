@@ -1,56 +1,74 @@
-from sqlalchemy import Column, Integer, String, Enum, ForeignKey, DateTime
 from datetime import datetime
 
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+
 from app.database import Base
-from app.schemas import Role, TutorSubject, Status
+from app.schemas import Role, TutorSubject, Status, HomeTaskStatus
 
 
 class User(Base):
     __tablename__ = 'users'
-    id = Column(Integer, primary_key=True)
-    email = Column(String)
-    password = Column(String)
-    role = Column(Enum(Role))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    firstname: Mapped[str]
+    lastname: Mapped[str]
+    email: Mapped[str]
+    password: Mapped[str]
+    role: Mapped[Role]
 
 
 class Subject(Base):
     __tablename__ = 'subjects'
-    id = Column(Integer, primary_key=True)
-    subject_name = Column(Enum(TutorSubject))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    subject_name: Mapped[TutorSubject]
 
 
 class TutorToSubject(Base):
     __tablename__ = 'tutor_to_subjects'
-    tutor_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
-    subject_id = Column(Integer, ForeignKey('subjects.id'), primary_key=True)
+    tutor_id: Mapped[int] = mapped_column(ForeignKey('users.id'), primary_key=True)
+    subject_id: Mapped[int] = mapped_column(ForeignKey('subjects.id'), primary_key=True)
 
 
 class TutorToStudent(Base):
     __tablename__ = 'tutor_to_students'
-    tutor_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
-    student_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    tutor_id: Mapped[int] = mapped_column(ForeignKey('users.id'), primary_key=True)
+    student_id: Mapped[int] = mapped_column(ForeignKey('users.id'), primary_key=True)
 
 
 class TutorToStudentRequest(Base):
     __tablename__ = 'tutor_to_student_requests'
-    id = Column(Integer, primary_key=True)
-    tutor_id = Column(Integer, ForeignKey('users.id'))
-    student_id = Column(Integer, ForeignKey('users.id'))
-    status = Column(Enum(Status))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tutor_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    student_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    status: Mapped[Status]
 
 
 class Lesson(Base):
     __tablename__ = 'lessons'
-    id = Column(Integer, primary_key=True)
-    tutor_id = Column(Integer, ForeignKey('users.id'))
-    student_id = Column(Integer, ForeignKey('users.id'))
-    subject_id = Column(Integer, ForeignKey('subjects.id'))
-    date_at = Column(DateTime, default=datetime.now().strftime('%Y-%m-%d %H:%M'))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tutor_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    student_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    subject_id: Mapped[int] = mapped_column(ForeignKey('subjects.id'))
+    date_at: Mapped[datetime] = mapped_column(nullable=True)
 
 
 class LessonRequest(Base):
-    __tablename__ = 'lesson_request'
-    id = Column(Integer, primary_key=True)
-    lesson_id = Column(Integer, ForeignKey('lessons.id'))
-    status_id = Column(Enum(Status))
-    new_date_at = Column(DateTime, default=datetime.utcnow, nullable=True)
+    __tablename__ = 'lesson_requests'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    lesson_id: Mapped[int] = mapped_column(ForeignKey('lessons.id'))
+    status: Mapped[Status]
+    reason: Mapped[str]
+    new_date_at: Mapped[datetime] = mapped_column(nullable=True)
+
+
+class HomeTask(Base):
+    __tablename__ = 'home_tasks'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str]
+    description: Mapped[str] = mapped_column(nullable=True)
+    tutor_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    student_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    deadline: Mapped[datetime] = mapped_column(nullable=True)
+    filename: Mapped[str] = mapped_column(nullable=True)
+    status: Mapped[HomeTaskStatus]
