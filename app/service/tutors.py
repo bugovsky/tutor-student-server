@@ -8,6 +8,7 @@ from ..models import TutorToSubject, Subject, User, TutorToStudent, Lesson
 
 
 async def add_subject(db: AsyncSession, tutor_id, subject_id: int):
+    await delete_subject(db, tutor_id, subject_id)
     new_tutor_subject = TutorToSubject(tutor_id=tutor_id, subject_id=subject_id)
     db.add(new_tutor_subject)
     await db.commit()
@@ -58,12 +59,12 @@ async def add_lesson(db: AsyncSession, lesson: schemas.LessonCreate, tutor_id: i
 
 
 async def get_schedule(db: AsyncSession, tutor_id: int) -> Sequence[Lesson]:
-    query = select(Lesson).where(Lesson.tutor_id == tutor_id)
+    query = select(Lesson).where(Lesson.tutor_id == tutor_id).order_by(Lesson.date_at)
     result = await db.execute(query)
     return result.scalars().all()
 
 
 async def get_schedule_by_student(db: AsyncSession, tutor_id: int, student_id: int) -> Sequence[Lesson]:
-    query = select(Lesson).where(Lesson.tutor_id == tutor_id, Lesson.student_id == student_id)
+    query = select(Lesson).where(Lesson.tutor_id == tutor_id, Lesson.student_id == student_id).order_by(Lesson.date_at)
     result = await db.execute(query)
     return result.scalars().all()

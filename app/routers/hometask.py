@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, status, HTTPException, UploadFile, Respo
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .. import database, schemas, oauth2
+from typing import List
 from ..utils import cloud
 from ..schemas import Role
 from ..service import hometask
@@ -29,7 +30,7 @@ async def create_home_task(
     return new_home_task
 
 
-@router.post("/{home_task_id}", status_code=status.HTTP_201_CREATED)
+@router.post("/{home_task_id}", status_code=status.HTTP_201_CREATED, response_model=schemas.HomeTaskOut)
 async def upload_home_task(
         home_task_id: int,
         file: UploadFile,
@@ -80,3 +81,12 @@ async def download_home_task(
             response = await client.get(download_link, follow_redirects=True)
             headers = {'Content-Disposition': f'attachment; filename={quote(home_task.filename)}'}
             return Response(content=response.content, media_type='application/pdf', headers=headers)
+
+
+@router.get('/', status_code=status.HTTP_200_OK, response_model=List[schemas.HomeTaskOut])
+async def get_home_tasks(
+        user: schemas.UserOut = Depends(oauth2.get_current_user),
+        db: AsyncSession = Depends(database.get_db)
+):
+    home_tasks = await hometask.get_home_tasks(db, user.id, user.role)
+    return home_tasks

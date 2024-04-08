@@ -31,7 +31,8 @@ async def add_subjects_to_tutor(
 
     tutor_out = schemas.TutorOut(
         id=user.id,
-        email=user.email,
+        firstname=user.firstname,
+        lastname=user.lastname,
         subjects=subject_names
     )
     return tutor_out
@@ -58,7 +59,8 @@ async def delete_tutors_subjects(
 
     tutor_out = schemas.TutorOut(
         id=user.id,
-        email=user.email,
+        firstname=user.firstname,
+        lastname=user.lastname,
         subjects=subject_names
     )
     return tutor_out

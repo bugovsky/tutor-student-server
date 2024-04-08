@@ -12,14 +12,14 @@ class Role(Enum):
 
 
 class TutorSubject(Enum):
-    russian = "russian"
-    literature = "literature"
-    mathematics = "mathematics"
-    history = "history"
-    biology = "biology"
-    chemistry = "chemistry"
-    english = "english"
-    physics = "physics"
+    russian = "Русский язык"
+    literature = "Литература"
+    mathematics = "Математика"
+    history = "История"
+    biology = "Биология"
+    chemistry = "Химия"
+    english = "Английский язык"
+    physics = "Физика"
 
 
 class Status(Enum):
@@ -80,12 +80,19 @@ class TutorToAdd(BaseModel):
 
 class TutorOut(BaseModel):
     id: int
-    email: EmailStr
+    firstname: str
+    lastname: str
     subjects: t.List[TutorSubject]
 
 
 class SubjectsCreate(BaseModel):
     subject_ids: t.List[int]
+
+class SubjectOut(BaseModel):
+    id: int
+    subject_name: TutorSubject
+    class Config:
+        from_attributes = True
 
 
 class LessonRequestCreate(BaseModel):
@@ -121,6 +128,7 @@ class HomeTaskOut(BaseModel):
     title: str
     tutor_id: int
     student_id: int
+    status: HomeTaskStatus
     description: t.Optional[str]
     deadline: t.Optional[datetime]
 

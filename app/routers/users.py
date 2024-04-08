@@ -29,3 +29,9 @@ async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
                             detail=f"Пользователь с id: {user_id} не найден")
 
     return user_by_id
+
+@router.get('/subject/{lesson_id}', status_code=status.HTTP_200_OK, response_model=schemas.SubjectOut)
+async def get_subject_by_lesson(lesson_id: int, db: AsyncSession = Depends(get_db)):
+    subject_by_id = await users.get_subject_by_lesson_id(db, lesson_id=lesson_id)
+    return subject_by_id
+
