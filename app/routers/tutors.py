@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .. import database, schemas, oauth2
 from ..schemas import Role
 from ..service.query import tutors
+from app.utils.redis import RedisHandler
 
 router = APIRouter(prefix="/tutors", tags=['Tutors'])
 
@@ -104,7 +105,14 @@ async def get_schedule(
             detail="Ученик не может просматривать расписание репетитора"
         )
 
+    redis_handler = RedisHandler()
+    cached_schedule = await redis_handler.get(key=f"schedule_{user.id}")
+    if cached_schedule:
+        return redis_handler.deserialize_schedule(cached_schedule)
+
     schedule = await tutors.get_schedule(db, user.id)
+    await redis_handler.set(f"schedule_{user.id}", redis_handler.serialize_schedule(schedule), ex=3600)
+
     return [lesson for lesson in schedule]
 
 
