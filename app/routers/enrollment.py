@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .. import database, schemas, oauth2
 from ..schemas import Role
-from ..service import enrollment
+from ..service.command import enrollment
 
 router = APIRouter(prefix="/enroll", tags=['Enrollment'])
 

@@ -3,7 +3,7 @@ from typing import Sequence, List
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..models import Lesson, User, TutorToSubject, Subject, TutorToStudent
+from app.models import Lesson, User, TutorToSubject, Subject, TutorToStudent
 
 
 async def get_schedule_by_tutor(db: AsyncSession, student_id: int, tutor_id: int) -> Sequence[Lesson]:
