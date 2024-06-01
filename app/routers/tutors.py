@@ -1,4 +1,3 @@
-import asyncio
 import typing as t
 
 from fastapi import APIRouter, Depends, status, HTTPException
@@ -6,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .. import database, schemas, oauth2
 from ..schemas import Role
-from ..service import tutors
+from ..service.query import tutors
 
 router = APIRouter(prefix="/tutors", tags=['Tutors'])
 

@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .. import database, schemas, oauth2
 from ..schemas import Role
-from ..service import reschedule
+from ..service.query import reschedule
 
 router = APIRouter(prefix="/reschedule", tags=['Reschedule'])
 

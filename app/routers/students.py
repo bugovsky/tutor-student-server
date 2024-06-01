@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .. import database, schemas, oauth2
 from ..schemas import Role
-from ..service import students
+from ..service.query import students
 
 router = APIRouter(prefix="/students", tags=['Students'])
 

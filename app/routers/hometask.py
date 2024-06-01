@@ -10,7 +10,7 @@ from .. import database, schemas, oauth2
 from typing import List
 from ..utils import cloud
 from ..schemas import Role
-from ..service import hometask
+from ..service.query import hometask
 
 router = APIRouter(prefix="/hometask", tags=['Hometasks'])
 

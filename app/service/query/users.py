@@ -1,9 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.utils import security
 from app.models import User, Subject, Lesson
-from app.schemas import UserCreate
 
 
 async def get_user_by_email(db: AsyncSession, email: str) -> User:
@@ -22,13 +20,3 @@ async def get_subject_by_lesson_id(db: AsyncSession, lesson_id: int) -> Subject:
     query = select(Subject).join(Lesson).where(Lesson.id == lesson_id)
     result = await db.execute(query)
     return result.scalars().first()
-
-
-
-async def create_user(db: AsyncSession, user: UserCreate) -> User:
-    user.password = security.generate_hash(user.password)
-    db_user = User(**user.dict())
-    db.add(db_user)
-    await db.commit()
-    await db.refresh(db_user)
-    return db_user
